@@ -1,5 +1,6 @@
 import os
 
+
 class FileManager:
     """ A class to facilitate path management and file operations to simplify common file-related tasks.
 
@@ -32,6 +33,9 @@ class FileManager:
 
     get_file_extension(path)
         Returns the file extension of a path (if any).
+
+    get_current_directory()
+        Returns the current working directory path.
 
     get_parent_directory(path)
         Returns the parent directory of a path (if any).
@@ -80,7 +84,7 @@ class FileManager:
     """
     def __init__(self, path=None):
         if path is None:
-            self._path = os.getcwd()
+            self._path = self.get_current_directory()
         else:
             self.path = path
 
@@ -169,6 +173,16 @@ class FileManager:
         self._validate_params(path, str, 'get file extension')
         return os.path.splitext(path)[1]
     
+    def get_current_directory(self):
+        """ Returns the current working directory path.
+
+        Returns
+        -------
+        str
+            The current working directory path.
+        """
+        return os.getcwd()
+
     def get_parent_directory(self, path=None):
         """ Returns the parent directory of a path (if any).
 
