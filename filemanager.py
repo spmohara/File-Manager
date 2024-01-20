@@ -6,8 +6,9 @@ class FileManager:
 
     Methods can be split into the following groups:
     - Path Validation (e.g., is_file, is_directory)
+    - Path Manipulation (e.g., path_join, get_file_extension)
     - File Operations (e.g., create_file, delete_file)
-    - Content Management (e.g., read_content, write_content)
+    - File Content Management (e.g., read_content, write_content)
     - Directory Operations (e.g., create_directory, delete_directory)
 
     Author
@@ -22,20 +23,29 @@ class FileManager:
 
     Methods
     -------
-    path_exists(path)
-        Checks if a path pointing to a file or directory exists.
-
     is_file(path)
         Checks if a path points to a file.
 
     is_directory(path)
         Checks if a path points to a directory.
 
-    get_file_extension(path)
-        Returns the file extension of a path (if any).
+    is_valid_path(path)
+        Checks if path is a file, directory, parent directory, or includes file extension.
+
+    path_exists(path)
+        Checks if a path pointing to a file or directory exists.
+
+    path_join(components)
+        Joins multiple path components into a single path.
 
     get_current_directory()
         Returns the current working directory path.
+
+    get_file_extension(path)
+        Returns the file extension of a path (if any).
+
+    get_file_name(path)
+        Returns the file name of a path (if any).
 
     get_parent_directory(path)
         Returns the parent directory of a path (if any).
@@ -94,30 +104,12 @@ class FileManager:
 
     @path.setter
     def path(self, value):
-        if isinstance(value, str) and self._is_valid_path(value):
+        if isinstance(value, str) and self.is_valid_path(value):
             self._path = value
         else:
             raise ValueError('Invalid path attribute')
 
     # --- Path Validation Methods ---
-
-    def path_exists(self, path=None):
-        """ Checks if a path pointing to a file or directory exists.
-
-        Parameters
-        ----------
-        path: ``None`` (default) or str
-            Optional parameter, the path of the file or directory.
-                ex: ``'C:\\Users\\johndoe\\Documents\\file.txt'`` or ``'C:\\Users\\johndoe\\Documents'``
-
-        Returns
-        -------
-        bool
-            ``True`` if path exists, otherwise ``False``.
-        """
-        path = self._path if path is None else path
-        self._validate_params(path, str, 'validate path')
-        return os.path.exists(path)
 
     def is_file(self, path=None):
         """ Checks if a path points to a file.
@@ -154,6 +146,66 @@ class FileManager:
         path = self._path if path is None else path
         self._validate_params(path, str, 'validate directory')
         return os.path.isdir(path)
+
+    def is_valid_path(self, path=None):
+        """ Checks if path is a file, directory, parent directory, or includes file extension.
+        Returns
+        -------
+        bool
+            ``True`` if path is valid, otherwise ``False``.
+        """
+        is_file = self.is_file(path)
+        is_dir = self.is_directory(path)
+        is_par = True if self.get_parent_directory(path) else False
+        has_ext = True if self.get_file_extension(path) else False
+        return is_file or is_dir or has_ext or is_par
+
+    def path_exists(self, path=None):
+        """ Checks if a path pointing to a file or directory exists.
+
+        Parameters
+        ----------
+        path: ``None`` (default) or str
+            Optional parameter, the path of the file or directory.
+                ex: ``'C:\\Users\\johndoe\\Documents\\file.txt'`` or ``'C:\\Users\\johndoe\\Documents'``
+
+        Returns
+        -------
+        bool
+            ``True`` if path exists, otherwise ``False``.
+        """
+        path = self._path if path is None else path
+        self._validate_params(path, str, 'validate path')
+        return os.path.exists(path)
+
+    # --- Path Manipulation Methods ---
+
+    def path_join(self, *components):
+        """ Joins multiple path components into a single path.
+
+        Parameters
+        ----------
+        *components: positional arguments
+            Any number of path components as strings.
+
+        Returns
+        -------
+        str
+            The joined single path.
+        """
+        for component in components:
+            self._validate_params(component, str, 'join path')
+        return os.path.join(*components)
+    
+    def get_current_directory(self):
+        """ Returns the current working directory path.
+
+        Returns
+        -------
+        str
+            The current working directory path.
+        """
+        return os.getcwd()
     
     def get_file_extension(self, path=None):
         """ Returns the file extension of a path (if any).
@@ -172,16 +224,24 @@ class FileManager:
         path = self._path if path is None else path
         self._validate_params(path, str, 'get file extension')
         return os.path.splitext(path)[1]
-    
-    def get_current_directory(self):
-        """ Returns the current working directory path.
+
+    def get_file_name(self, path=None):
+        """ Returns the file name of a path (if any).
+
+        Parameters
+        ----------
+        path: ``None`` (default) or str
+            Optional parameter, the path of the file.
+                ex: ``'C:\\Users\\johndoe\\Documents\\file.txt'``
 
         Returns
         -------
         str
-            The current working directory path.
+            The file name of a path (if any).
         """
-        return os.getcwd()
+        path = self._path if path is None else path
+        self._validate_params(path, str, 'get file name')
+        return os.path.basename(path)
 
     def get_parent_directory(self, path=None):
         """ Returns the parent directory of a path (if any).
@@ -245,7 +305,7 @@ class FileManager:
         self._validate_params(path, str, 'delete file')
         self._op_handler(path, 'remove')
 
-    # --- Content Management Methods ---
+    # --- File Content Management Methods ---
 
     def read_content(self, path=None):
         """ Reads the file content.
@@ -419,17 +479,10 @@ class FileManager:
         self._validate_params(path, str, 'delete directory')
         self._op_handler(path, 'rmdir')
 
-    def _is_valid_path(self, path=None):
-        is_file = self.is_file(path)
-        is_dir = self.is_directory(path)
-        has_ext = True if self.get_file_extension(path) else False
-        is_par = True if self.get_parent_directory(path) else False
-        return is_file or is_dir or has_ext or is_par
-
     def _validate_params(self, params, types, op):
-        if not isinstance(params, tuple):
+        if not isinstance(params, (list, tuple, dict, set)):
             params = (params,)
-        if not isinstance(types, tuple):
+        if not isinstance(types, (list, tuple, dict, set)):
             types = (types,)
         for param, type_ in zip(params, types):
             if not (param and isinstance(param, type_)):
