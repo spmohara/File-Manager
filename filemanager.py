@@ -2,7 +2,7 @@ import os
 
 
 class FileManager:
-    """ A class to facilitate path management and file operations to simplify common file-related tasks.
+    """ A class to facilitate path management and file operations for common file-related tasks.
 
     Methods can be split into the following groups:
     - Path Validation (e.g., is_file, is_directory)
@@ -23,74 +23,79 @@ class FileManager:
 
     Methods
     -------
-    is_file(path)
-        Checks if a path points to a file.
+    Path Validation
+        is_file(path)
+            Checks if a path points to a file.
 
-    is_directory(path)
-        Checks if a path points to a directory.
+        is_directory(path)
+            Checks if a path points to a directory.
 
-    is_valid_path(path)
-        Checks if path is a file, directory, parent directory, or includes file extension.
+        is_valid_path(path)
+            Checks if path is a file, directory, parent directory, or includes file extension.
 
-    path_exists(path)
-        Checks if a path pointing to a file or directory exists.
+        path_exists(path)
+            Checks if a path pointing to a file or directory exists.
 
-    path_join(components)
-        Joins multiple path components into a single path.
+    Path Manipulation
+        path_join(components)
+            Joins multiple path components into a single path.
 
-    get_current_directory()
-        Returns the current working directory path.
+        get_current_directory()
+            Returns the current working directory path.
 
-    get_file_extension(path)
-        Returns the file extension of a path (if any).
+        get_file_extension(path)
+            Returns the file extension of a path (if any).
 
-    get_file_name(path)
-        Returns the file name of a path (if any).
+        get_file_name(path)
+            Returns the file name of a path (if any).
 
-    get_parent_directory(path)
-        Returns the parent directory of a path (if any).
+        get_parent_directory(path)
+            Returns the parent directory of a path (if any).
 
-    create_file(path):
-        Creates a new file.
+    File Operations
+        create_file(path):
+            Creates a new file.
 
-    rename_file(new_path, path):
-        Renames an existing file.
+        rename_file(new_path, path):
+            Renames an existing file.
 
-    delete_file(path):
-        Deletes an existing file.
+        delete_file(path):
+            Deletes an existing file.
 
-    read_content(path):
-        Reads the file content.
+    File Content Management
+        read_content(path):
+            Reads the file content.
 
-    write_content(content, path):
-        Writes the provided content to a file.
+        write_content(content, path):
+            Writes the provided content to a file.
 
-    append_content(content, path):
-        Appends the provided content to a file.
+        append_content(content, path):
+            Appends the provided content to a file.
 
-    read_line(path):
-        Reads single line of a file.
+        read_line(path):
+            Reads single line of a file.
 
-    read_all_lines(path):
-        Reads all lines of a file.
+        read_all_lines(path):
+            Reads all lines of a file.
 
-    write_lines(lines, path):
-        Writes the provided lines to a file.
+        write_lines(lines, path):
+            Writes the provided lines to a file.
 
-    clear_file_content(path):
-        Clears the file content.
+        clear_file_content(path):
+            Clears the file content.
+    
+    Directory Operations
+        list_directory_contents(path):
+            Lists the contents of a directory.
 
-    list_directory_contents(path):
-        Lists the contents of a directory.
+        create_directory(path):
+            Creates a new directory.
 
-    create_directory(path):
-        Creates a new directory.
+        rename_directory(new_path, path):
+            Renames an existing directory.
 
-    rename_directory(new_path, path):
-        Renames an existing directory.
-
-    delete_directory(path):
-        Deletes an existing directory.
+        delete_directory(path):
+            Deletes an existing directory.
     """
     def __init__(self, path=None):
         if path is None:
@@ -187,6 +192,7 @@ class FileManager:
         ----------
         *components: positional arguments
             Any number of path components as strings.
+                ex: ``'C:\\Users\\johndoe\\Documents'``, ``'file.txt'``
 
         Returns
         -------
@@ -283,10 +289,11 @@ class FileManager:
         ----------
         new_path: str
             The path of the new file.
+                ex: ``'C:\\Users\\johndoe\\Documents\\file2.txt'``
         
         path: ``None`` (default) or str
             Optional parameter, the path of the file.
-                ex: ``'C:\\Users\\johndoe\\Documents\\file.txt'``
+                ex: ``'C:\\Users\\johndoe\\Documents\\file1.txt'``
         """
         path = self._path if path is None else path
         self._validate_params((new_path, path), (str, str), 'rename file')
@@ -457,10 +464,11 @@ class FileManager:
         ----------
         new_path: str
             The path of the new directory.
+                ex: ``'C:\\Users\\johndoe\\Documents\\folder2'``
         
         path: ``None`` (default) or str
             Optional parameter, the path of the directory.
-                ex: ``'C:\\Users\\johndoe\\Documents'``
+                ex: ``'C:\\Users\\johndoe\\Documents\\folder1'``
         """
         path = self._path if path is None else path
         self._validate_params((new_path, path), (str, str), 'rename directory')

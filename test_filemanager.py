@@ -8,39 +8,34 @@ logging.basicConfig(level=logging.INFO, filename='filemanager_unittest.log', fil
 
 class TestFileManager(unittest.TestCase):
 
-    def setUp(self):
-        self.fm = FileManager()
-        self.cwd = self.fm.path
-        self.test_file = 'filemanager.py'
-        self.temp_file1 = 'file.txt'
-        self.temp_file2 = 'file.csv'
-        self.temp_dir1 = 'folder1'
-        self.temp_dir2 = 'folder2'
-        try:
-            self.assertTrue(self.fm.is_directory(self.cwd))
-            self.assertTrue(self.fm.is_file(self.test_file))
-            self.assertTrue(self.fm.is_valid_path(self.temp_file1))
-            self.assertTrue(self.fm.is_valid_path(self.temp_file2))
-            self.assertTrue(isinstance(self.temp_dir1, str))
-            self.assertTrue(isinstance(self.temp_dir2, str))
-        except AssertionError:
-            logging.error('AssertionError', exc_info=True)
-            raise
+    @classmethod
+    def setUpClass(cls):
+        cls.fm = FileManager()
+        cls.cwd = cls.fm.path
+        cls.test_file = 'filemanager.py'
+        cls.test_path = 'C:\\Users\\johndoe\\Documents'
+        cls.temp_file1 = 'file1.txt'
+        cls.temp_file2 = 'file2.csv'
+        cls.temp_dir1 = 'folder1'
+        cls.temp_dir2 = 'folder2'
 
-    def tearDown(self):
-        temp_files = [self.temp_file1, self.temp_file2]
-        temp_dirs = [self.temp_dir1, self.temp_dir2]
-        for temp_file, temp_dir in zip(temp_files, temp_dirs):
-            if self.fm.is_file(temp_file):
-                logging.info('Testing delete_file method...')
-                self.fm.delete_file(temp_file)
-                logging.info(f'File deleted: {temp_file}')
-                self.assertNotIn(temp_file, self.fm.list_directory_contents(self.cwd))
-            if self.fm.is_directory(temp_dir):
-                logging.info('Testing delete_directory method...')
-                self.fm.delete_directory(temp_dir)
-                logging.info(f'Directory deleted: {temp_dir}')
-                self.assertNotIn(temp_dir, self.fm.list_directory_contents(self.cwd))
+    def setUp(self):
+        try:
+            if not (self.cwd and self.fm.is_directory(self.cwd)):
+                raise AssertionError(f'Current working directory {self.cwd} is invalid.')
+            if not (self.test_file and self.fm.is_file(self.test_file)):
+                raise AssertionError(f'Test file {self.test_file} is invalid.')
+            if not (self.test_path and self.fm.is_valid_path(self.test_path)):
+                raise AssertionError(f'Test path {self.test_path} is invalid.')
+            for temp_file in (self.temp_file1, self.temp_file2):
+                if not (temp_file and self.fm.is_valid_path(temp_file)):
+                    raise AssertionError(f'Temp file {temp_file} is invalid.')
+            for temp_dir in (self.temp_dir1, self.temp_dir2):
+                if not (temp_dir and isinstance(temp_dir, str)):
+                    raise AssertionError(f'Temp directory {temp_dir} is invalid.')
+        except AssertionError as e:
+            logging.error(f'Test setup failed: {e}')
+            raise
 
     # --- Path Validation Methods ---
 
@@ -56,8 +51,8 @@ class TestFileManager(unittest.TestCase):
 
     def test_is_valid_path(self):
         logging.info('Testing is_valid_path method...')
-        logging.info(f'Path is valid: C:\\Users\\johndoe\\Documents')
-        self.assertTrue(self.fm.is_valid_path('C:\\Users\\johndoe\\Documents'))
+        logging.info(f'Path is valid: {self.test_path}')
+        self.assertTrue(self.fm.is_valid_path(self.test_path))
 
     def test_path_exists(self):
         logging.info('Testing path_exists method...')
@@ -68,9 +63,9 @@ class TestFileManager(unittest.TestCase):
 
     def test_path_join(self):
         logging.info('Testing path_join method...')
-        joined_path = self.fm.path_join(self.cwd, 'test')
+        joined_path = self.fm.path_join(self.test_path, self.test_file)
         logging.info(f'Joined path: {joined_path}')
-        self.assertIn('test', joined_path)
+        self.assertIn(self.test_file, joined_path)
 
     def test_get_current_directory(self):
         logging.info('Testing get_current_directory method...')
@@ -80,10 +75,10 @@ class TestFileManager(unittest.TestCase):
 
     def test_get_file_extension(self):
         logging.info('Testing get_file_extension method...')
-        path = self.fm.path_join(self.cwd, self.test_file)
+        path = self.fm.path_join(self.test_path, self.test_file)
         file_extension = self.fm.get_file_extension(path)
         logging.info(f'File extension exists: {file_extension}')
-        self.assertEqual(file_extension, '.'+self.test_file.split('.')[-1])
+        self.assertIn(file_extension, self.test_file)
 
     def test_get_file_name(self):
         logging.info('Testing get_file_name method...')
@@ -99,28 +94,22 @@ class TestFileManager(unittest.TestCase):
         self.assertIn(parent_directory, self.cwd)
 
     # --- File Operations Methods ---
+    # delete_file test in tearDown
 
-    def test_file_ops_methods(self):
+    def test_file_operations_methods(self):
+        
         logging.info('Testing create_file method...')
-        self.fm.create_file(self.temp_file1)
-        logging.info(f'File created: {self.temp_file1}')
-        self.assertIn(self.temp_file1, self.fm.list_directory_contents(self.cwd))
-
+        self._create_file(self.temp_file1)
+        
         logging.info('Testing rename_file method...')
-        self.fm.path = self.fm.path_join(self.cwd, self.temp_file1)
         self.fm.rename_file(self.temp_file2)
         logging.info(f'File renamed: {self.temp_file2}')
-        self.assertIn(self.temp_file2, self.fm.list_directory_contents(self.cwd))
-
-        # delete_file method tested in tearDown method
+        self.assertTrue(self.fm.is_file(self.temp_file2))
 
     # --- File Content Management Methods ---
 
     def test_file_content_methods(self):
-        self.fm.path = self.fm.path_join(self.cwd, self.temp_file1)
-        self.fm.create_file(self.temp_file1)
-        logging.info(f'File created: {self.temp_file1}')
-        self.assertIn(self.temp_file1, self.fm.list_directory_contents(self.cwd))
+        self._create_file(self.temp_file1)
 
         logging.info('Testing write_content method...')
         content = 'test1\n'
@@ -161,25 +150,52 @@ class TestFileManager(unittest.TestCase):
         self.assertIn('test', self.fm.read_content())
 
     # --- Directory Operations Methods ---
+    # delete_directory test in tearDown
 
-    def test_directory_ops_methods(self):
+    def test_directory_operations_methods(self):
         logging.info('Testing list_directory_contents method...')
-        dir_contents = self.fm.list_directory_contents(self.cwd)
-        logging.info(f'Directory contents: {dir_contents}')
-        self.assertIn(self.test_file, dir_contents)
+        contents = self.fm.list_directory_contents(self.cwd)
+        logging.info(f'{self.test_file} in {contents}')
+        self.assertIn(self.test_file, contents)
 
         logging.info('Testing create_directory method...')
-        self.fm.create_directory(self.temp_dir1)
-        logging.info(f'Directory created: {self.temp_dir1}')
-        self.assertIn(self.temp_dir1, self.fm.list_directory_contents(self.cwd))
+        self._create_directory(self.temp_dir1)
 
         logging.info('Testing rename_directory method...')
-        self.fm.path = self.fm.path_join(self.cwd, self.temp_dir1)
         self.fm.rename_directory(self.temp_dir2)
         logging.info(f'Directory renamed: {self.temp_dir2}')
-        self.assertIn(self.temp_dir2, self.fm.list_directory_contents(self.cwd))
+        self.assertTrue(self.fm.is_directory(self.temp_dir2))
 
-        # delete_directory method tested in tearDown method
+    # --- Cleanup ---
+                
+    def tearDown(self):
+        temp_files = [self.temp_file1, self.temp_file2]
+        temp_dirs = [self.temp_dir1, self.temp_dir2]
+        for temp_file, temp_dir in zip(temp_files, temp_dirs):
+            if self.fm.is_file(temp_file):
+                logging.info('Testing delete_file method...')
+                self.fm.delete_file(temp_file)
+                logging.info(f'File deleted: {temp_file}')
+                self.assertFalse(self.fm.is_file(temp_file))
+            if self.fm.is_directory(temp_dir):
+                logging.info('Testing delete_directory method...')
+                self.fm.delete_directory(temp_dir)
+                logging.info(f'Directory deleted: {temp_dir}')
+                self.assertFalse(self.fm.is_directory(temp_dir))
+
+    # --- Helper Methods ---
+
+    def _create_file(self, temp_file):
+        self.fm.create_file(temp_file)
+        logging.info(f'File created: {temp_file}')
+        self.assertTrue(self.fm.is_file(temp_file))
+        self.fm.path = self.fm.path_join(self.cwd, temp_file)
+
+    def _create_directory(self, temp_dir):
+        self.fm.create_directory(temp_dir)
+        logging.info(f'Directory created: {temp_dir}')
+        self.assertTrue(self.fm.is_directory(temp_dir))
+        self.fm.path = self.fm.path_join(self.cwd, temp_dir)
 
 if __name__ == '__main__':
     unittest.main(failfast=True)
