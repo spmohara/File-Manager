@@ -39,7 +39,7 @@ file_manager.path = 'C:\\Users\\johndoe\\Documents'
 ```
 
 ## Methods
-- <u>Note</u>: All **path** parameters are optional if using the **path** attribute.
+- <ins>Note</ins>: All **path** parameters are optional if using the **path** attribute.
 ### Path Validation
 #### Checks if a path points to a file.
 ```python
