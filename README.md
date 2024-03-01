@@ -68,24 +68,29 @@ file_manager.path_exists(path='C:\\Users\\johndoe\\Documents\\file.txt')
 file_manager.path_join('C:\\Users\\johndoe\\Documents', 'file.txt')
 ```
 
+#### Changes the current working directory.
+```python
+file_manager.change_directory(path='C:\\Users\\johndoe')
+```
+
 #### Returns the current working directory path.
 ```python
 file_manager.get_current_directory()
 ```
 
-#### Returns the file extension of a path (if any).
-```python
-file_manager.get_file_extension(path='C:\\Users\\johndoe\\Documents\\file.txt')
-```
-
-#### Returns the file name of a path (if any).
-```python
-file_manager.get_file_name(path='C:\\Users\\johndoe\\Documents\\file.txt')
-```
-
 #### Returns the parent directory of a path (if any).
 ```python
 file_manager.get_parent_directory(path='C:\\Users\\johndoe\\Documents')
+```
+
+#### Returns the base name of a path (if any).
+```python
+file_manager.get_base_name(path='C:\\Users\\johndoe\\Documents\\file.txt')
+```
+
+#### Returns the file extension of a path (if any).
+```python
+file_manager.get_file_extension(path='C:\\Users\\johndoe\\Documents\\file.txt')
 ```
 
 ### File Operations

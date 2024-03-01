@@ -39,18 +39,21 @@ class FileManager:
     Path Manipulation
         path_join(components)
             Joins multiple path components into a single path.
+        
+        change_directory(path)
+            Changes the current working directory.
 
         get_current_directory()
             Returns the current working directory path.
 
-        get_file_extension(path)
-            Returns the file extension of a path (if any).
-
-        get_file_name(path)
-            Returns the file name of a path (if any).
-
         get_parent_directory(path)
             Returns the parent directory of a path (if any).
+
+        get_base_name(path)
+            Returns the base name of a path (if any).
+
+        get_file_extension(path)
+            Returns the file extension of a path (if any).
 
     File Operations
         create_file(path):
@@ -203,6 +206,19 @@ class FileManager:
             self._validate_params(component, str, 'join path')
         return os.path.join(*components)
     
+    def change_directory(self, path=None):
+        """ Changes the current working directory.
+
+        Parameters
+        ----------
+        path: ``None`` (default) or str
+            Optional parameter, the path of the directory.
+                ex: ``'C:\\Users\\johndoe'``
+        """
+        path = self._path if path is None else path
+        self._validate_params(path, str, 'change directory')
+        os.chdir(path)
+
     def get_current_directory(self):
         """ Returns the current working directory path.
 
@@ -212,42 +228,6 @@ class FileManager:
             The current working directory path.
         """
         return os.getcwd()
-    
-    def get_file_extension(self, path=None):
-        """ Returns the file extension of a path (if any).
-
-        Parameters
-        ----------
-        path: ``None`` (default) or str
-            Optional parameter, the path of the file.
-                ex: ``'C:\\Users\\johndoe\\Documents\\file.txt'``
-
-        Returns
-        -------
-        str
-            The file extension of a path (if any).
-        """
-        path = self._path if path is None else path
-        self._validate_params(path, str, 'get file extension')
-        return os.path.splitext(path)[1]
-
-    def get_file_name(self, path=None):
-        """ Returns the file name of a path (if any).
-
-        Parameters
-        ----------
-        path: ``None`` (default) or str
-            Optional parameter, the path of the file.
-                ex: ``'C:\\Users\\johndoe\\Documents\\file.txt'``
-
-        Returns
-        -------
-        str
-            The file name of a path (if any).
-        """
-        path = self._path if path is None else path
-        self._validate_params(path, str, 'get file name')
-        return os.path.basename(path)
 
     def get_parent_directory(self, path=None):
         """ Returns the parent directory of a path (if any).
@@ -266,6 +246,42 @@ class FileManager:
         path = self._path if path is None else path
         self._validate_params(path, str, 'get parent directory')
         return os.path.dirname(path)
+
+    def get_base_name(self, path=None):
+        """ Returns the base name of a path (if any).
+
+        Parameters
+        ----------
+        path: ``None`` (default) or str
+            Optional parameter, the path of the file/directory.
+                ex: ``'C:\\Users\\johndoe\\Documents\\file.txt'``
+
+        Returns
+        -------
+        str
+            The base name of a path (if any).
+        """
+        path = self._path if path is None else path
+        self._validate_params(path, str, 'get base name')
+        return os.path.basename(path)
+    
+    def get_file_extension(self, path=None):
+        """ Returns the file extension of a path (if any).
+
+        Parameters
+        ----------
+        path: ``None`` (default) or str
+            Optional parameter, the path of the file.
+                ex: ``'C:\\Users\\johndoe\\Documents\\file.txt'``
+
+        Returns
+        -------
+        str
+            The file extension of a path (if any).
+        """
+        path = self._path if path is None else path
+        self._validate_params(path, str, 'get file extension')
+        return os.path.splitext(path)[1]
 
     # --- File Operations Methods ---
 
